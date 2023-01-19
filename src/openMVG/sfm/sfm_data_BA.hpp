@@ -100,7 +100,9 @@ class Bundle_Adjustment
     // the SfM scene to refine
     sfm::SfM_Data & sfm_data,
     // tell which parameter needs to be adjusted
-    const Optimize_Options & options
+    const Optimize_Options & options,
+    // modification:: BA object needs to know what type of work is being performed.
+    int workType
   ) = 0;
 };
 

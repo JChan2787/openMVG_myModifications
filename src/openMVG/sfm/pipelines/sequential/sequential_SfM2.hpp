@@ -57,7 +57,10 @@ public:
   bool AddingMissingView(const float & track_inlier_ratio);
 
   /// Adjust intrinsics, landmark and extrinsics according the user config.
-  bool BundleAdjustment();
+  // modification:: Adding a parameter argument here so we can specify what type of 
+  // BundleAdjustment Sequential_SfM2 is performing.
+  // bool BundleAdjustment();
+  bool BundleAdjustment(int workType = 0);
 
   /**
    * Set the default lens distortion type to use if it is declared unknown

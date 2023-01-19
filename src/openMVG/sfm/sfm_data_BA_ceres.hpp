@@ -62,7 +62,13 @@ class Bundle_Adjustment_Ceres : public Bundle_Adjustment
     // the SfM scene to refine
     sfm::SfM_Data & sfm_data,
     // tell which parameter needs to be adjusted
-    const Optimize_Options & options
+    const Optimize_Options & options,
+    // modification:: BA object needs to know what type of work is being performed.
+    // 0 -- Default, no extra logs done using OpenMVGLog
+    // 1 -- GlobalSfM pipeline
+    // 2 -- IncrementalSfM pipeline
+    // 3 -- Specialized case
+    int workType = 0
   ) override;
 };
 

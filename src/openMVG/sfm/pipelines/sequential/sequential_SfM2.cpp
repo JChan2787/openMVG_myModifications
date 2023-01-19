@@ -93,6 +93,9 @@ bool SequentialSfMReconstructionEngine2::Process() {
   //- 3. Final bundle Adjustment
   //-------------------
 
+  // modification::-
+  OPENMVG_LOG_INFO << "[- Incremental SFMV2 -] Start";
+
   //--
   //- 1. Init the reconstruction with a Seed
   //--
@@ -147,6 +150,9 @@ bool SequentialSfMReconstructionEngine2::Process() {
   //--
   IndexT resection_round = 0;
 
+  // modification::-
+  OPENMVG_LOG_INFO << "[- Incremental SFMV2 -] PointCamera Refinement";
+
   // Incrementally estimate the pose of the cameras based on a confidence score.
   // The confidence score is based on the track_inlier_ratio.
   // First the camera with the most of 2D-3D overlap are added then we add
@@ -183,10 +189,13 @@ bool SequentialSfMReconstructionEngine2::Process() {
     }
   }
 
+  // modification::-
+  OPENMVG_LOG_INFO << "[- Incremental SFMV2 -] Final Refinement";
+
   //--
   //- 3. Final bundle Adjustment
   //--
-  BundleAdjustment();
+  BundleAdjustment(3);
 
   //-- Reconstruction done.
   //-- Display some statistics
@@ -504,7 +513,8 @@ bool SequentialSfMReconstructionEngine2::AddingMissingView
   return (pose_after != pose_before);
 }
 
-bool SequentialSfMReconstructionEngine2::BundleAdjustment()
+// modification:: Added a parameter argument, see .hpp file.
+bool SequentialSfMReconstructionEngine2::BundleAdjustment(int workType)
 {
   Bundle_Adjustment_Ceres::BA_Ceres_options options;
   if ( sfm_data_.GetPoses().size() > 100 &&
@@ -528,7 +538,7 @@ bool SequentialSfMReconstructionEngine2::BundleAdjustment()
       Control_Point_Parameter(),
       this->b_use_motion_prior_
     );
-  return bundle_adjustment_obj.Adjust(sfm_data_, ba_refine_options);
+  return bundle_adjustment_obj.Adjust(sfm_data_, ba_refine_options, workType);
 }
 
 } // namespace sfm

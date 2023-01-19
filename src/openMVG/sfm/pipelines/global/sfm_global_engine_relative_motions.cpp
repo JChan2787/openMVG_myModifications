@@ -111,6 +111,9 @@ void GlobalSfMReconstructionEngine_RelativeMotions::SetTranslationAveragingMetho
 
 bool GlobalSfMReconstructionEngine_RelativeMotions::Process() {
 
+  // modification::
+  OPENMVG_LOG_INFO << "[- Global SFM Pipeline -] 0%";
+
   //-------------------
   // Keep only the largest biedge connected subgraph
   //-------------------
@@ -135,22 +138,36 @@ bool GlobalSfMReconstructionEngine_RelativeMotions::Process() {
     return false;
   }
 
+  // modification::
+  OPENMVG_LOG_INFO << "[- Global SFM Pipeline -] 25%";
+
   matching::PairWiseMatches  tripletWise_matches;
   if (!Compute_Global_Translations(global_rotations, tripletWise_matches))
   {
     OPENMVG_LOG_ERROR << "GlobalSfM:: Translation Averaging failure!";
     return false;
   }
+
+  // modification::
+  OPENMVG_LOG_INFO << "[- Global SFM Pipeline -] 50%";
+
   if (!Compute_Initial_Structure(tripletWise_matches))
   {
     OPENMVG_LOG_ERROR << "GlobalSfM:: Cannot initialize an initial structure!";
     return false;
   }
+
+  // modification::
+  OPENMVG_LOG_INFO << "[- Global SFM Pipeline -] 75%";
+
   if (!Adjust())
   {
     OPENMVG_LOG_ERROR << "GlobalSfM:: Non-linear adjustment failure!";
     return false;
   }
+
+  // modification::
+  OPENMVG_LOG_INFO << "[- Global SFM Pipeline -] 100%";
 
   //-- Export statistics about the SfM process
   if (!sLogging_file_.empty())
@@ -429,7 +446,10 @@ bool GlobalSfMReconstructionEngine_RelativeMotions::Adjust()
         Extrinsic_Parameter_Type::ADJUST_TRANSLATION, // Rotations are held as constant
         Structure_Parameter_Type::ADJUST_ALL,
         Control_Point_Parameter(),
-        this->b_use_motion_prior_)
+        this->b_use_motion_prior_),
+
+        // modification: Pass in the pipeline type.
+        2
     );
   if (b_BA_Status)
   {
@@ -449,7 +469,10 @@ bool GlobalSfMReconstructionEngine_RelativeMotions::Adjust()
           Extrinsic_Parameter_Type::ADJUST_ALL,
           Structure_Parameter_Type::ADJUST_ALL,
           Control_Point_Parameter(),
-          this->b_use_motion_prior_)
+          this->b_use_motion_prior_),
+
+          // modification: Pass in the pipeline type.
+          2
       );
     if (b_BA_Status && !sLogging_file_.empty())
     {
@@ -520,7 +543,12 @@ bool GlobalSfMReconstructionEngine_RelativeMotions::Adjust()
     Control_Point_Parameter(),
     this->b_use_motion_prior_);
 
-  b_BA_Status = bundle_adjustment_obj.Adjust(sfm_data_, ba_refine_options);
+  b_BA_Status = bundle_adjustment_obj.Adjust(sfm_data_, ba_refine_options, 
+
+    // modification: Pass in the pipeline type.
+    3
+  );
+
   if (b_BA_Status && !sLogging_file_.empty())
   {
     Save(sfm_data_,
